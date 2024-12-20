@@ -1,0 +1,68 @@
+<ion-content color-theme="light">
+  <app-header color-theme="light" [centerTitle]="true" [isModal]=true [title]="task ? 'Tarea' : 'Nueva Tarea'"></app-header>
+
+  <app-custom-input [control]="form.controls.title" type="text" label="Título"></app-custom-input>
+  <div class="validators" *ngIf="form.controls.title.errors && form.controls.title.dirty">
+    <div *ngIf="form.controls.title.errors?.['required']">Campo requerido</div>
+    <div *ngIf="form.controls.title.errors?.['minlength']">Debe escribir al menos 4 carácteres</div>
+  </div>
+
+  <app-custom-input [control]="form.controls.description" type="textarea" label="Descripción"></app-custom-input>
+  <div class="validators" *ngIf="form.controls.description.errors && form.controls.description.dirty">
+    <div *ngIf="form.controls.description.errors?.['required']">Campo requerido</div>
+    <div *ngIf="form.controls.description.errors?.['minlength']">Debe escribir al menos 4 carácteres</div>
+  </div>
+
+  <!--<ion-item class="item-header" lines="none">
+    <ion-label>Actividades</ion-label>
+    <ion-button (click)="createItem()" slot="end" mode="ios">
+      <ion-icon name="add-circle-outline"></ion-icon>
+    </ion-button>
+  </ion-item>-->
+
+  <ion-grid fixed>
+    <ion-row>
+      <ion-col size="12">
+        <ion-button (click)="takePhoto()" expand="block" fill="clear" shape="round">
+          Tomar foto
+        </ion-button>
+      </ion-col>
+      <ion-col size="6">      
+      </ion-col>
+    </ion-row>
+  </ion-grid>
+
+  
+    <ion-reorder-group [disabled]="false" (ionItemReorder)="handleReorder($any($event))">
+      <div *ngFor="let item of form.value.items; index as i">
+        <ion-item lines="none">
+          <ion-checkbox slot="start" color="success" [(ngModel)]="item.completed"></ion-checkbox>
+          <ion-label class="ion-text-wrap">{{item.name}}          
+          </ion-label>
+  
+          <ion-buttons slot="end">
+            <ion-button (click)="removeItem(i)">
+              <ion-icon name="trash-outline"></ion-icon>
+            </ion-button>
+          </ion-buttons>
+  
+          <ion-reorder slot="end"></ion-reorder>
+        </ion-item>
+        
+        <ion-item class="item-reorder">
+          <ion-reorder slot="end"></ion-reorder>
+        </ion-item>
+
+      </div>
+            
+    </ion-reorder-group>
+  
+
+</ion-content>
+<ion-footer>
+  <div class="ion-text-center">
+    <ion-button class="ion-margin" mode="ios" [disabled]="form.invalid" (click)="submit()" shape="round">
+      {{ task ? 'Guardar Cambios' : 'Crear Tarea'}}
+    </ion-button>
+  </div>
+</ion-footer>
