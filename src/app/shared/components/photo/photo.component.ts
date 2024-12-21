@@ -14,7 +14,8 @@ export class PhotoComponent implements OnInit {
 
   ngOnInit() {
     Camera.requestPermissions();
-    
+    this.CreateDir();
+
   }
 
   async takePhoto() {
@@ -26,20 +27,31 @@ export class PhotoComponent implements OnInit {
       source: CameraSource.Camera,
     });
 
-    if(image){
-    this.SavePhoto(image.base64String!);
-  }
+    if (image) {
+      this.SavePhoto(image.base64String!);
+    }
 
   }
 
-  async SavePhoto(photo: string)
-  {
+  async SavePhoto(photo: string) {
     await Filesystem.writeFile({
       path: 'Test.jpg',
       data: photo,
       directory: Directory.Documents,
-      
+
     });
+  }
+
+  CreateDir() {
+    Filesystem.mkdir(
+      {
+        path: 'ImageTest',
+        directory: Directory.Documents
+      }
+    ).then(res => { console.log(res) })
+      .catch(err => {
+        console.log(err);
+      })
   }
 }
 
