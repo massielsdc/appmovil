@@ -1,5 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { Camera, CameraResultType, CameraSource } from '@capacitor/camera';
+import { Directory, Filesystem } from '@capacitor/filesystem';
+
 
 @Component({
   selector: 'app-photo',
@@ -18,21 +20,27 @@ export class PhotoComponent implements OnInit {
   async takePhoto() {
     debugger;
     const image = await Camera.getPhoto({
-      quality: 90,
+      quality: 40,
       allowEditing: false,
-      resultType: CameraResultType.Uri,
+      resultType: CameraResultType.Base64,
       source: CameraSource.Camera,
     });
 
-    // image.webPath will contain a path that can be set as an image src.
-    // You can access the original file using image.path, which can be
-    // passed to the Filesystem API to read the raw data of the image,
-    // if desired (or pass resultType: CameraResultType.Base64 to getPhoto)
-    var imageUrl = image.webPath;
+    if(image){
+    this.SavePhoto(image.base64String!);
+  }
 
-    // Can be set to the src of an image now
-    //imageElement.src = imageUrl;
-  };
+  }
+
+  async SavePhoto(photo: string)
+  {
+    await Filesystem.writeFile({
+      path: 'Test.jpg',
+      data: photo,
+      directory: Directory.Documents,
+      
+    });
+  }
 }
 
 
