@@ -1,8 +1,8 @@
-export interface Task{
+export interface Task {
     id: string,
     title: string,
     description: string,
-    items: Item[]
+    items?: Item[]
 }
 
 export interface Item{

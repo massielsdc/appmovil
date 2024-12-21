@@ -5,6 +5,7 @@ import { Item, Task } from 'src/app/models/task.model';
 import { User } from 'src/app/models/user.model';
 import { FirebaseService } from 'src/app/services/firebase.service';
 import { UtilsService } from 'src/app/services/utils.service';
+import { Camera, CameraResultType, CameraSource } from '@capacitor/camera';
 
 @Component({
   selector: 'app-add-update-task',
@@ -12,6 +13,7 @@ import { UtilsService } from 'src/app/services/utils.service';
   styleUrls: ['./add-update-task.component.scss'],
 })
 export class AddUpdateTaskComponent implements OnInit {
+  
 
   @Input() task: Task;
   user = {} as User
@@ -20,7 +22,7 @@ export class AddUpdateTaskComponent implements OnInit {
     id: new FormControl(''),
     title: new FormControl('', [Validators.required, Validators.minLength(4)]),
     description: new FormControl('', [Validators.required, Validators.minLength(4)]),
-    items: new FormControl([], [Validators.required, Validators.minLength(1)]),
+    items: new FormControl([], [Validators.required]),
   })
 
   constructor(
@@ -32,7 +34,8 @@ export class AddUpdateTaskComponent implements OnInit {
     this.user = this.utilsSvc.getElementFromLocalStorage('user')
 
     if (this.task) {
-      this.form.setValue(this.task);
+      this.task.items = this.task.items || [];
+      this.form.patchValue(this.task);
       this.form.updateValueAndValidity()
 
     }
@@ -60,7 +63,7 @@ export class AddUpdateTaskComponent implements OnInit {
     this.utilsSvc.presentLoading();
     delete this.form.value.id;
 
-    this.firebaseSvc.addToSubcollection(path, 'task', this.form.value).then(res => {
+    this.firebaseSvc.addToSubcollection(path, 'tasks', this.form.value).then(res => {
 
       this.utilsSvc.dismissModal({ sucess: true });
 
@@ -123,17 +126,19 @@ export class AddUpdateTaskComponent implements OnInit {
   }
 
 
-  //reordenar las actividades
-  handleReorder(ev: CustomEvent<ItemReorderEventDetail>) {
-    this.form.value.items = ev.detail.complete(this.form.value.items);
-    this.form.updateValueAndValidity();
-  }
+ // Reordenar
+handleReorder(ev: CustomEvent<ItemReorderEventDetail>) {
+  const items = this.form.controls.items.value;
+  this.form.controls.items.setValue(ev.detail.complete(items));
+}
 
-  //Eliminar actividad
-  removeItem(index: number) {
-    this.form.value.items.splice(index, 1);
-    this.form.controls.items.updateValueAndValidity();
-  }
+// Eliminar
+removeItem(index: number) {
+  const items = this.form.controls.items.value;
+  items.splice(index, 1);
+  this.form.controls.items.setValue(items);
+}
+
 
   //Crear actividad
   createItem() {
@@ -144,27 +149,49 @@ export class AddUpdateTaskComponent implements OnInit {
         {
           name: 'name',
           type: 'textarea',
-          placeholder: 'Hacer algo...'
-        }
+          placeholder: 'Hacer algo...',
+        },
       ],
       buttons: [
         {
           text: 'Cancelar',
           role: 'cancel',
-
-        }, {
+        },
+        {
           text: 'Agregar',
           handler: (res) => {
-
-
-            let item: Item = { name: res.name, completed: false };
-            this.form.value.items.push(item);
-            this.form.controls.items.updateValueAndValidity();
-
-          }
-        }
-      ]
-    })
+            const item: Item = { name: res.name, completed: false };
+            const items = this.form.controls.items.value;
+            items.push(item);
+            this.form.controls.items.setValue(items);
+          },
+        },
+      ],
+    });
+  }
+  
+  
+   //Sacar foto
+  takePhoto()
+  {
+    debugger;
+    const takePicture = async () => {
+      const image = await Camera.getPhoto({
+        quality: 90,
+        allowEditing: false,
+        resultType: CameraResultType.Uri,
+        source: CameraSource.Camera
+      });
+    
+      // image.webPath will contain a path that can be set as an image src.
+      // You can access the original file using image.path, which can be
+      // passed to the Filesystem API to read the raw data of the image,
+      // if desired (or pass resultType: CameraResultType.Base64 to getPhoto)
+      var imageUrl = image.webPath;
+    
+      // Can be set to the src of an image now
+      //imageElement.src = imageUrl;
+    };
   }
 
 }

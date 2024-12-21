@@ -13,30 +13,23 @@
     <div *ngIf="form.controls.description.errors?.['minlength']">Debe escribir al menos 4 carácteres</div>
   </div>
 
-  <!--<ion-item class="item-header" lines="none">
+  
+
+  <ion-item class="item-header" lines="none">
     <ion-label>Actividades</ion-label>
+    <ion-button (click)="takePhoto()" mode="ios">
+      <ion-icon name="camera-outline"></ion-icon>          
+    </ion-button>  
     <ion-button (click)="createItem()" slot="end" mode="ios">
       <ion-icon name="add-circle-outline"></ion-icon>
     </ion-button>
-  </ion-item>-->
-
-  <ion-grid fixed>
-    <ion-row>
-      <ion-col size="12">
-        <ion-button (click)="takePhoto()" expand="block" fill="clear" shape="round">
-          Tomar foto
-        </ion-button>
-      </ion-col>
-      <ion-col size="6">      
-      </ion-col>
-    </ion-row>
-  </ion-grid>
+  </ion-item>
 
   
     <ion-reorder-group [disabled]="false" (ionItemReorder)="handleReorder($any($event))">
       <div *ngFor="let item of form.value.items; index as i">
         <ion-item lines="none">
-          <ion-checkbox slot="start" color="success" [(ngModel)]="item.completed"></ion-checkbox>
+          <ion-checkbox slot="start" color="success" aria-label="label" [(ngModel)]="item.completed"></ion-checkbox>
           <ion-label class="ion-text-wrap">{{item.name}}          
           </ion-label>
   
